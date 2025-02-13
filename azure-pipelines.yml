@@ -1,0 +1,35 @@
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: deploy_ec2
+    displayName: Terraform deploy ec2
+    jobs:
+      - job: deploy_job
+        displayName: terraform job
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terraform install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terra init
+          inputs:
+            provider: 'aws'
+            command: 'init'
+            backendServiceAWS: ''
+            backendAWSBucketName: ''
+            backendAWSKey: 'terraform.state'
+        - task: TerraformTaskV4@4
+          displayName: terra plan
+          inputs:
+            provider: 'aws'
+            command: 'plan'
+            environmentServiceNameAWS: ''
