@@ -1,0 +1,37 @@
+ Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: destroy_ec2
+    displayName: Terraform deploy ec2
+    jobs:
+      - job: deploy_job
+        displayName: terraform job
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terraform install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'aws'
+            command: 'init'
+            backendServiceAWS: 'acá va el service connector'
+            backendAWSBucketName: 'acá va el bucket de s3 con remote backend'
+            backendAWSKey: 'terraform.state'
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'aws'
+            command: 'plan'
+            environmentServiceNameAWS: 'acá va el service connector'
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'aws'
+            command: 'destroy'
+            environmentServiceNameAWS: 'acá va el service connector'
